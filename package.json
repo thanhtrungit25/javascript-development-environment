@@ -3,7 +3,14 @@
   "version": "1.0.0",
   "description": "JavaScript development environment Pluralsight course by Cory House",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "prestart": "babel-node buildScripts/startMessage.js",
+    "start": "npm-run-all --parallel open:src",
+    "open:src": "babel-node buildScripts/srcServer.js",
+    "security-check": "nsp check;exit 0",
+    "localtunnel": "lt --port 3000 --subdomain trundang",
+    "share": "npm-run-all --parallel open:src localtunnel"
+  },
   "keywords": [],
   "author": "Cory House",
   "license": "ISC",
