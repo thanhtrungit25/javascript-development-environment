@@ -3,8 +3,14 @@ import jsdom from 'jsdom';
 import fs from 'fs';
 
 describe('Our first test', () => {
-  it('should pass', () => {
+  it('should pass one', () => {
     expect(true).to.equal(true);
+  });
+});
+
+describe('Our second test', () => {
+  it('should pass two', () => {
+    expect(false).to.equal(false);
   });
 });
 
