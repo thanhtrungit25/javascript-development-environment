@@ -1,21 +1,36 @@
 import path from 'path';
 import webpack from 'webpack';
 import HtmlWebpakPlugin from 'html-webpack-plugin';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import WebpackMd5Hash from 'webpack-md5-hash';
 
 export default {
   debug: true,
   devtool: 'source-map',
   noInfo: false,
-  entry: [
-    path.resolve(__dirname, 'src/index')
-  ],
+  entry: {
+    vendor: path.resolve(__dirname, 'src/vendor'),
+    main: path.resolve(__dirname, 'src/index')
+  },
   target: 'web',
   output: {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/',
-    filename: 'bundle.js'
+    filename: '[name].[chunkhash].js'
   },
   plugins: [
+    // Generate an external css file with a hash in the filename
+    new ExtractTextPlugin('[name].[contenthash].css'),
+
+    // Hash the files using MD5 so that their names change when content changes
+    new WebpackMd5Hash,
+
+    // use commonsChunkPlugin to create separate bundle
+    // of vendor libraries so that they are cached separately
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor'
+    }),
+
     // create HTML file that includes reference to bundle JS
     new HtmlWebpakPlugin({
       template: 'src/index.html',
@@ -31,11 +46,7 @@ export default {
         minifyCSS: true,
         minifyURLs: true
       },
-      inject: true,
-
-      // Properties you define hereare available in index.html
-      // using htmlWebpackPlugin.options.varName
-      trackJSToken: "3161d70dca1b48d9915015509a67e9a5"
+      inject: true
     }),
     // Eliminate duplicate packages when generating bundle
     new webpack.optimize.DedupePlugin(),
@@ -45,7 +56,7 @@ export default {
   module: {
     loaders: [
       {test: /\.js$/, exclude: /node_modules/, loaders: ['babel']},
-      {test: /\.css$/, loaders: ['style','css']}
+      {test: /\.css$/, loader: ExtractTextPlugin.extract('css?sourceMap')}
     ]
   }
 }
